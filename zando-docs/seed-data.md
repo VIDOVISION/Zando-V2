@@ -125,3 +125,27 @@ To test the application end-to-end with the seed data, you need a real authentic
    UPDATE profiles SET organization_id = '10000000-0000-0000-0000-000000000001' WHERE id = '<your-auth-uid>';
    ```
 4. The seeded inventory and stock movements will then be visible to your authenticated session through the existing RLS policies.
+
+---
+
+## Migration 0004 — Dev Preview Policies
+
+`supabase/migrations/0004_dev_preview_read_policies.sql` adds anonymous (`anon` role) SELECT policies so that `/products` and `/stock` can show seeded data in dev preview mode (`ZANDO_DEV_PREVIEW=true`) without a Supabase session.
+
+**Apply to:** local development database only.
+**Do not apply to:** staging or production.
+
+Migrations 0001–0003 are safe for all environments. Migrations 0004–0005 are intentionally excluded from production apply lists.
+
+---
+
+## Migration 0005 — Dev Preview Anon Grants
+
+`supabase/migrations/0005_dev_preview_anon_grants.sql` grants `SELECT` to the `anon` role on the six tables used by dev preview reads.
+
+**Why this is needed in addition to 0004:** Postgres has two separate access layers. RLS policies (migration 0004) control *which rows* a role sees. Table-level `GRANT SELECT` controls *whether the role can touch the table at all*. Without this grant, Postgres raises `42501 permission denied for table` before RLS is even evaluated.
+
+**Apply to:** local development database only.
+**Do not apply to:** staging or production.
+
+In production, `SELECT` grants to `anon` are unnecessary (all production queries use `TO authenticated` policies) and would expose table access to unauthenticated API requests.

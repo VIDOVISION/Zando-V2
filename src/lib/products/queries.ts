@@ -1,21 +1,36 @@
 import 'server-only'
-import { isDevPreview } from '@/src/lib/dev'
 import { createClient } from '@/src/lib/supabase/server'
 import type { Product, ProductCategory } from './types'
 
-const supabaseConfigured =
-  Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
-  Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+  const configured =
+    Boolean(url) &&
+    Boolean(key) &&
+    !url.includes('your-project-ref')  // guard against unconfigured placeholder
+  return { url, key, configured }
+}
 
-function shouldSkipDb(): boolean {
-  return isDevPreview() || !supabaseConfigured
+function warnDev(message: string, detail?: unknown) {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`[zando/products] ${message}`, detail ?? '')
+  }
 }
 
 export async function getProducts(opts: {
   search?: string
   categoryId?: string
 } = {}): Promise<Product[]> {
-  if (shouldSkipDb()) return []
+  const { configured, url } = getSupabaseConfig()
+
+  if (!configured) {
+    warnDev(
+      'Supabase not configured — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local',
+      { url: url || '(empty)' },
+    )
+    return []
+  }
 
   const supabase = await createClient()
 
@@ -36,13 +51,22 @@ export async function getProducts(opts: {
 
   const { data, error } = await query
 
-  if (error || !data) return []
+  if (error) {
+    warnDev('getProducts query error', { code: error.code, message: error.message, hint: error.hint })
+    return []
+  }
 
-  return (data as unknown as Product[])
+  if (!data) {
+    warnDev('getProducts returned null data (no error)')
+    return []
+  }
+
+  return data as unknown as Product[]
 }
 
 export async function getProductCategories(): Promise<ProductCategory[]> {
-  if (shouldSkipDb()) return []
+  const { configured } = getSupabaseConfig()
+  if (!configured) return []
 
   const supabase = await createClient()
 
@@ -51,7 +75,10 @@ export async function getProductCategories(): Promise<ProductCategory[]> {
     .select('id, name, slug')
     .order('name', { ascending: true })
 
-  if (error || !data) return []
+  if (error) {
+    warnDev('getProductCategories query error', { code: error.code, message: error.message })
+    return []
+  }
 
-  return data as unknown as ProductCategory[]
+  return (data ?? []) as unknown as ProductCategory[]
 }

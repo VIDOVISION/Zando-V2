@@ -40,7 +40,7 @@ Build one module at a time. Each phase must be complete and working before movin
 
 - [x] Products list page with search and category filter (`src/app/(app)/products/page.tsx`)
 - [x] Product card, list, empty state components (`src/components/products/`)
-- [x] Product types + server queries (`src/lib/products/`)
+- [x] Product types + server queries — connected to live Supabase (`src/lib/products/`)
 - [ ] Product detail page
 - [ ] Create/edit product form (platform_admin only)
 - [x] Seed file: `supabase/seed.sql` — 1 org, 1 shop, 4 categories, 9 products, 9 inventory items, 9 opening stock movements
@@ -54,7 +54,7 @@ Build one module at a time. Each phase must be complete and working before movin
 
 - [x] Stock page foundation — overview, low-stock alerts, inventory list, recent movements (`src/app/(app)/stock/page.tsx`)
 - [x] Stock components — summary row, item card, list, movement list, empty state (`src/components/stock/`)
-- [x] Inventory types + queries — `getCurrentShopId`, `getStockItems`, `getRecentMovements` (`src/lib/inventory/`)
+- [x] Inventory types + queries — connected to live Supabase (`src/lib/inventory/`)
 - [ ] Inventory item detail with movement history
 - [ ] Stock adjustment form (manual in/out)
 - [ ] DB trigger: stock_movements insert → update inventory_items.quantity_on_hand
