@@ -43,7 +43,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Product types + server queries (`src/lib/products/`)
 - [ ] Product detail page
 - [ ] Create/edit product form (platform_admin only)
-- [ ] Seed file: `fixtures/products.ts` with 20 sample products
+- [x] Seed file: `supabase/seed.sql` — 1 org, 1 shop, 4 categories, 9 products, 9 inventory items, 9 opening stock movements
 - [ ] Test: non-admin roles see products read-only
 
 ---
