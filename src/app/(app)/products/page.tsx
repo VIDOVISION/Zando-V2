@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { isDevPreview } from '@/src/lib/dev'
 import { requireRole } from '@/src/lib/auth/require-role'
 import { getProducts, getProductCategories } from '@/src/lib/products/queries'
@@ -48,15 +49,13 @@ export default async function ProductsPage({
             </p>
           )}
         </div>
-        {isAdmin && (
-          <button
-            type="button"
-            disabled
-            className="rounded-lg bg-[#0d9488] px-3 py-2 text-sm font-medium text-white opacity-40"
-            title="Disponible bientôt"
+        {(isAdmin || isDevPreview()) && (
+          <Link
+            href="/products/new"
+            className="rounded-lg bg-[#0d9488] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0f766e]"
           >
             + Nouveau
-          </button>
+          </Link>
         )}
       </div>
 
