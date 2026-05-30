@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Product } from '@/src/lib/products/types'
 
 type Props = {
@@ -6,7 +7,10 @@ type Props = {
 
 export function ProductCard({ product }: Props) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <Link
+      href={`/products/${product.id}`}
+      className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+    >
       {/* Icon placeholder (replaces image until image_url is served) */}
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#f0fdfa]">
         <svg
@@ -62,6 +66,6 @@ export function ProductCard({ product }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

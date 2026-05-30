@@ -41,7 +41,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Products list page with search and category filter (`src/app/(app)/products/page.tsx`)
 - [x] Product card, list, empty state components (`src/components/products/`)
 - [x] Product types + server queries — connected to live Supabase (`src/lib/products/`)
-- [ ] Product detail page
+- [x] Product detail page (`src/app/(app)/products/[productId]/page.tsx`)
 - [ ] Create/edit product form (platform_admin only)
 - [x] Seed file: `supabase/seed.sql` — 1 org, 1 shop, 4 categories, 9 products, 9 inventory items, 9 opening stock movements
 - [ ] Test: non-admin roles see products read-only

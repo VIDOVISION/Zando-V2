@@ -36,6 +36,15 @@ export type StockMovement = {
   created_at: string
 }
 
+// Minimal inventory snapshot shown on product detail pages.
+export type ProductInventorySummary = {
+  quantity_on_hand: number
+  min_quantity: number
+  selling_price: number | null
+  currency: CurrencyCode | null
+  is_low_stock: boolean
+}
+
 // Aggregated summary for the stock overview row.
 export type StockSummary = {
   total_items: number

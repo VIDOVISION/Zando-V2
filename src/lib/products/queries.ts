@@ -64,6 +64,30 @@ export async function getProducts(opts: {
   return data as unknown as Product[]
 }
 
+export async function getProductById(id: string): Promise<Product | null> {
+  const { configured } = getSupabaseConfig()
+  if (!configured) return null
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('products')
+    .select(
+      'id, category_id, name, slug, description, unit, sku, is_active, image_url, created_at, updated_at, category:product_categories(id, name, slug)',
+    )
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    if (error.code !== 'PGRST116') {
+      warnDev('getProductById error', { id, code: error.code, message: error.message })
+    }
+    return null
+  }
+
+  return data as unknown as Product
+}
+
 export async function getProductCategories(): Promise<ProductCategory[]> {
   const { configured } = getSupabaseConfig()
   if (!configured) return []

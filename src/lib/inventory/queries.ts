@@ -1,7 +1,7 @@
 import 'server-only'
 import { createClient } from '@/src/lib/supabase/server'
 import type { CurrencyCode } from '@/src/lib/supabase/types'
-import type { StockItem, StockMovement, StockSummary } from './types'
+import type { StockItem, StockMovement, StockSummary, ProductInventorySummary } from './types'
 
 function getSupabaseConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
@@ -171,6 +171,49 @@ export async function getRecentMovements(shopId: string, limit = 20): Promise<St
       created_at: r.created_at as string,
     } satisfies StockMovement
   })
+}
+
+// Returns the inventory snapshot for a single product in a specific shop.
+// Uses maybeSingle() so that "no inventory row" returns null without a PGRST116 error.
+export async function getInventoryForProduct(
+  productId: string,
+  shopId: string,
+): Promise<ProductInventorySummary | null> {
+  const { configured } = getSupabaseConfig()
+  if (!configured) return null
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .select('quantity_on_hand, min_quantity, selling_price, currency')
+    .eq('product_id', productId)
+    .eq('shop_id', shopId)
+    .maybeSingle()
+
+  if (error) {
+    warnDev('getInventoryForProduct error', {
+      productId,
+      shopId,
+      code: error.code,
+      message: error.message,
+    })
+    return null
+  }
+
+  if (!data) return null
+
+  const r = data as unknown as Record<string, unknown>
+  const qoh = Number(r.quantity_on_hand ?? 0)
+  const minQ = Number(r.min_quantity ?? 0)
+
+  return {
+    quantity_on_hand: qoh,
+    min_quantity: minQ,
+    selling_price: r.selling_price != null ? Number(r.selling_price) : null,
+    currency: (r.currency as CurrencyCode | null) ?? null,
+    is_low_stock: minQ > 0 && qoh <= minQ,
+  } satisfies ProductInventorySummary
 }
 
 export function computeSummary(items: StockItem[]): StockSummary {
