@@ -42,22 +42,22 @@ export default async function StockPage() {
       {/* Page header */}
       <div>
         <h1 className="text-xl font-semibold text-gray-900">Stock</h1>
-        {shopId && (
+        {shopId && items.length > 0 && (
           <p className="mt-0.5 text-sm text-gray-400">
             {items.length} article{items.length !== 1 ? 's' : ''} dans votre inventaire
           </p>
         )}
       </div>
 
-      {/* No shop context */}
-      {!shopId && (
+      {/* No shop context — only shown in production when the user has no linked shop */}
+      {!shopId && !isDevPreview() && (
         <StockEmptyState
           message="Aucune boutique associée"
           detail="Ce compte n'est pas lié à une boutique. Contactez un administrateur pour configurer votre accès."
         />
       )}
 
-      {shopId && (
+      {(shopId || isDevPreview()) && (
         <>
           {/* 1. Stock overview */}
           <section aria-labelledby="overview-heading">
