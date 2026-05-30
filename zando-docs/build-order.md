@@ -9,11 +9,12 @@ Build one module at a time. Each phase must be complete and working before movin
 **Goal:** Supabase connected, auth working, role-based routing in place.
 
 - [ ] Set up Supabase project and get credentials
-- [ ] Install Supabase JS client
-- [ ] Create all tables from database-schema.md
-- [ ] Write RLS policies per role-permissions.md
-- [ ] Create enums in Postgres
-- [ ] Create `profiles` trigger (auto-create profile on auth.user insert)
+- [x] Install Supabase JS client (`@supabase/supabase-js`, `@supabase/ssr`)
+- [x] Create all tables from database-schema.md (`supabase/migrations/0001_zando_v2_core_schema.sql`)
+- [x] Write RLS policies per role-permissions.md (included in migration 0001)
+- [x] Create enums in Postgres (included in migration 0001)
+- [x] Create `profiles` trigger (auto-create profile on auth.user insert — `trg_create_profile_on_signup` in migration 0001)
+- [x] Set up Supabase client helpers (`src/lib/supabase/client.ts`, `server.ts`, `types.ts`)
 - [ ] Set up Next.js middleware for auth guard
 - [ ] Build login page (`/login`)
 - [ ] Build post-login redirect by role
