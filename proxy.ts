@@ -5,6 +5,18 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Route protection (redirect to /login) is handled inside individual page
 // Server Components via requireRole(), not here.
 export async function proxy(request: NextRequest) {
+  // Skip session refresh when ZANDO_DEV_PREVIEW=true or when Supabase is not
+  // yet configured (no credentials in .env.local). This lets developers access
+  // the app shell without a live Supabase project.
+  const devPreview = process.env.ZANDO_DEV_PREVIEW === 'true'
+  const supabaseConfigured =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
+  if (devPreview || !supabaseConfigured) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -16,12 +28,12 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          // First, write the updated cookies onto the request so that any
-          // downstream server code within this same request can read them.
+          // Write updated cookies onto the request so downstream server code
+          // within the same request can read the refreshed values.
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           )
-          // Re-create the response so we can set updated cookies on the reply.
+          // Re-create the response so updated cookies are sent to the browser.
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -31,9 +43,9 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  // Calling getUser() triggers a silent token refresh when the access token
-  // is close to expiry. The result is intentionally discarded here — each
-  // page enforces its own auth requirements via requireRole().
+  // getUser() triggers a silent token refresh when the access token is close
+  // to expiry. The result is intentionally discarded — each page enforces its
+  // own auth requirements via requireRole().
   await supabase.auth.getUser()
 
   return supabaseResponse

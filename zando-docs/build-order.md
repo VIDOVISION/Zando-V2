@@ -15,7 +15,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Create enums in Postgres (included in migration 0001)
 - [x] Create `profiles` trigger (auto-create profile on auth.user insert — `trg_create_profile_on_signup` in migration 0001)
 - [x] Set up Supabase client helpers (`src/lib/supabase/client.ts`, `server.ts`, `types.ts`)
-- [x] Set up auth + role foundation (`src/lib/auth/`, `proxy.ts`, `app/auth/callback/route.ts`)
+- [x] Set up auth + role foundation (`src/lib/auth/`, `proxy.ts`, `src/app/auth/callback/route.ts`)
 - [ ] Build login page (`/login`)
 - [ ] Build post-login redirect by role
 - [ ] Test: each role can log in and land on their dashboard shell
@@ -26,9 +26,9 @@ Build one module at a time. Each phase must be complete and working before movin
 
 **Goal:** Each role sees their dashboard with real layout, no data yet.
 
-- [ ] Build shared layout (bottom tabs on mobile, sidebar on desktop)
-- [ ] Build dashboard page per role (empty state cards)
-- [ ] Implement role-aware navigation (tabs visible based on profile.role)
+- [x] Build shared layout — bottom tabs on mobile, sidebar on desktop (`src/components/layout/`)
+- [x] Build app shell + placeholder dashboard (`src/app/(app)/dashboard/page.tsx`)
+- [ ] Build role-aware navigation (tabs visible based on profile.role)
 - [ ] Test: UI renders correctly on 375px (iPhone SE) and 1280px (desktop)
 
 ---
