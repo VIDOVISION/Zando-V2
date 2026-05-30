@@ -122,7 +122,7 @@ BEGIN
   VALUES
     (cat_boissons, 'Boissons', 'boissons'),
     (cat_eau,      'Eau',      'eau'),
-    (cat_bieres,   'Bières',   'bieres'),
+    (cat_bieres,   E'Bi\u00e8res',   'bieres'),
     (cat_jus,      'Jus',      'jus')
   ON CONFLICT (slug) DO NOTHING;
 
@@ -133,13 +133,13 @@ BEGIN
   VALUES
     (prod_fanta,    cat_jus,    'Fanta Orange 50cl', 'fanta-orange-50cl', 'Soda orange Fanta bouteille 50cl', 'bouteille', 'FAO50',  true),
     (prod_vitalo,   cat_jus,    'Vitalo 50cl',       'vitalo-50cl',       'Jus Vitalo bouteille 50cl',        'bouteille', 'VIT50',  true),
-    (prod_nkoyi_b,  cat_bieres, 'Nkoyi Blonde',      'nkoyi-blonde',      'Bière Nkoyi Blonde 33cl',          'bouteille', 'NKB33',  true),
-    (prod_nkoyi_bl, cat_bieres, 'Nkoyi Black',       'nkoyi-black',       'Bière Nkoyi Black 33cl',           'bouteille', 'NKBL33', true),
-    (prod_beaufort, cat_bieres, 'Beaufort',          'beaufort',          'Bière Beaufort 65cl',              'bouteille', 'BEA65',  true),
-    (prod_heineken, cat_bieres, 'Heineken',          'heineken',          'Bière Heineken 33cl',              'bouteille', 'HEI33',  true),
-    (prod_castel,   cat_bieres, 'Castel',            'castel',            'Bière Castel 65cl',                'bouteille', 'CAS65',  true),
-    (prod_tembo,    cat_bieres, 'Tembo',             'tembo',             'Bière Tembo 65cl',                 'bouteille', 'TEM65',  true),
-    (prod_eau_vive, cat_eau,    'Eau Vive 50cl',     'eau-vive-50cl',     'Eau minérale Eau Vive 50cl',       'bouteille', 'EAV50',  true)
+    (prod_nkoyi_b,  cat_bieres, 'Nkoyi Blonde',      'nkoyi-blonde',      E'Bi\u00e8re Nkoyi Blonde 33cl',          'bouteille', 'NKB33',  true),
+    (prod_nkoyi_bl, cat_bieres, 'Nkoyi Black',       'nkoyi-black',       E'Bi\u00e8re Nkoyi Black 33cl',           'bouteille', 'NKBL33', true),
+    (prod_beaufort, cat_bieres, 'Beaufort',          'beaufort',          E'Bi\u00e8re Beaufort 65cl',              'bouteille', 'BEA65',  true),
+    (prod_heineken, cat_bieres, 'Heineken',          'heineken',          E'Bi\u00e8re Heineken 33cl',              'bouteille', 'HEI33',  true),
+    (prod_castel,   cat_bieres, 'Castel',            'castel',            E'Bi\u00e8re Castel 65cl',                'bouteille', 'CAS65',  true),
+    (prod_tembo,    cat_bieres, 'Tembo',             'tembo',             E'Bi\u00e8re Tembo 65cl',                 'bouteille', 'TEM65',  true),
+    (prod_eau_vive, cat_eau,    'Eau Vive 50cl',     'eau-vive-50cl',     E'Eau min\u00e9rale Eau Vive 50cl',       'bouteille', 'EAV50',  true)
   ON CONFLICT (slug) DO NOTHING;
 
   -- -------------------------------------------------------------------------
