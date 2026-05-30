@@ -119,7 +119,7 @@ function MenuIcon() {
 const navItems = [
   { label: LABELS.dashboard, href: '/dashboard', icon: <HouseIcon /> },
   { label: LABELS.products, href: '/products', icon: <BoxIcon /> },
-  { label: LABELS.inventory, href: '/inventory', icon: <LayersIcon /> },
+  { label: LABELS.inventory, href: '/stock', icon: <LayersIcon /> },
   { label: LABELS.orders, href: '/orders', icon: <FileTextIcon /> },
   { label: LABELS.more, href: '/more', icon: <MenuIcon /> },
 ] as const

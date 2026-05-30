@@ -126,7 +126,7 @@ function MenuIcon() {
 const navItems: NavItem[] = [
   { label: NAV_LABELS.dashboard, href: '/dashboard', icon: <HouseIcon /> },
   { label: NAV_LABELS.products, href: '/products', icon: <BoxIcon /> },
-  { label: NAV_LABELS.inventory, href: '/inventory', icon: <LayersIcon /> },
+  { label: NAV_LABELS.inventory, href: '/stock', icon: <LayersIcon /> },
   { label: NAV_LABELS.orders, href: '/orders', icon: <FileTextIcon /> },
   { label: NAV_LABELS.more, href: '/more', icon: <MenuIcon /> },
 ]

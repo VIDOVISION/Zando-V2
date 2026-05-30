@@ -51,7 +51,9 @@ Build one module at a time. Each phase must be complete and working before movin
 
 **Goal:** Shops can see and manage their stock.
 
-- [ ] Inventory list page (filtered to current shop)
+- [x] Stock page foundation — overview, low-stock alerts, inventory list, recent movements (`src/app/(app)/stock/page.tsx`)
+- [x] Stock components — summary row, item card, list, movement list, empty state (`src/components/stock/`)
+- [x] Inventory types + queries — `getCurrentShopId`, `getStockItems`, `getRecentMovements` (`src/lib/inventory/`)
 - [ ] Inventory item detail with movement history
 - [ ] Stock adjustment form (manual in/out)
 - [ ] DB trigger: stock_movements insert → update inventory_items.quantity_on_hand

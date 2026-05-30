@@ -182,6 +182,8 @@ One row per `(shop_id, product_id)` pair. `UNIQUE (shop_id, product_id)` enforce
 | product_id | uuid FK → products.id NOT NULL | RESTRICT delete |
 | quantity_on_hand | numeric(12,3) NOT NULL | DEFAULT 0; CHECK >= 0 |
 | min_quantity | numeric(12,3) NOT NULL | DEFAULT 0; CHECK >= 0 |
+| selling_price | numeric(12,2) | nullable — the shop's per-unit selling price |
+| currency | currency_code | nullable — currency for selling_price; NULL when selling_price is NULL |
 | created_at | timestamptz NOT NULL | DEFAULT now() |
 | updated_at | timestamptz NOT NULL | DEFAULT now(); set by fn_apply_stock_movement (not a BEFORE UPDATE trigger) |
 
