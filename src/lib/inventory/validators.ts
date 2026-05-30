@@ -1,4 +1,35 @@
-import type { CurrencyCode } from '@/src/lib/supabase/types'
+import type { CurrencyCode, MovementType } from '@/src/lib/supabase/types'
+
+// Types that reduce stock — used for pre-insert availability check.
+export const OUTBOUND_MOVEMENT_TYPES: MovementType[] = [
+  'sale_out',
+  'adjustment_out',
+  'damage',
+  'transfer_out',
+]
+
+export type AdjustStockValues = {
+  movement_type: MovementType
+  quantity: number
+  note: string | null
+}
+
+export type AdjustStockErrors = Partial<Record<keyof AdjustStockValues | '_form', string>>
+
+export function validateAdjustStock(values: AdjustStockValues): AdjustStockErrors {
+  const errors: AdjustStockErrors = {}
+
+  if (!values.movement_type) {
+    errors.movement_type = 'Sélectionnez un type de mouvement.'
+  }
+
+  if (isNaN(values.quantity) || values.quantity <= 0) {
+    errors.quantity = 'La quantité doit être un nombre > 0.'
+  }
+
+  return errors
+}
+
 
 export type AddInventoryItemValues = {
   product_id: string

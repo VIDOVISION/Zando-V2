@@ -57,7 +57,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Inventory types + queries — connected to live Supabase (`src/lib/inventory/`)
 - [ ] Inventory item detail with movement history
 - [x] Add product to inventory form — platform_admin (`src/app/(app)/stock/add/page.tsx`)
-- [ ] Stock adjustment form (manual in/out)
+- [x] Stock adjustment form — platform_admin (`src/app/(app)/stock/[inventoryItemId]/adjust/page.tsx`)
 - [ ] DB trigger: stock_movements insert → update inventory_items.quantity_on_hand
 - [ ] Low-stock alert badge on nav tab
 - [ ] Test: adjusting stock creates a stock_movement row and updates quantity_on_hand

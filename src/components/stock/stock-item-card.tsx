@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { StockItem } from '@/src/lib/inventory/types'
 
 type Props = {
@@ -53,6 +54,16 @@ export function StockItemCard({ item }: Props) {
           </span>
         </p>
       )}
+
+      {/* Adjust action */}
+      <div className="mt-3 border-t border-gray-100 pt-3">
+        <Link
+          href={`/stock/${item.id}/adjust`}
+          className="text-xs font-medium text-[#0d9488] hover:underline"
+        >
+          Ajuster →
+        </Link>
+      </div>
     </div>
   )
 }

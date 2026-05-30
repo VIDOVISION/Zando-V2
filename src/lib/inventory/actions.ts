@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation'
 import { isDevPreview, DEV_PROFILE } from '@/src/lib/dev'
 import { getCurrentProfile } from '@/src/lib/auth/get-current-profile'
 import { createClient } from '@/src/lib/supabase/server'
-import { validateAddInventoryItem } from './validators'
-import type { AddInventoryItemErrors } from './validators'
-import type { CurrencyCode } from '@/src/lib/supabase/types'
+import { validateAddInventoryItem, validateAdjustStock, OUTBOUND_MOVEMENT_TYPES } from './validators'
+import type { AddInventoryItemErrors, AdjustStockErrors } from './validators'
+import type { CurrencyCode, MovementType } from '@/src/lib/supabase/types'
 
 export type AddInventoryItemState = {
   errors?: AddInventoryItemErrors
@@ -139,6 +139,105 @@ export async function addProductToInventory(
       await (supabase.from('inventory_items').delete().eq('id', invItem.id) as unknown)
       return { message: `Mouvement de stock échoué: ${smError.message}` }
     }
+  }
+
+  redirect('/stock')
+}
+
+// ─── adjustStock ─────────────────────────────────────────────────────────────
+
+export type AdjustStockState = {
+  errors?: AdjustStockErrors
+  message?: string
+}
+
+export async function adjustStock(
+  _prevState: AdjustStockState,
+  formData: FormData,
+): Promise<AdjustStockState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    const profile = await getCurrentProfile()
+    if (!profile) {
+      warnDev('adjustStock: no profile for authenticated user', { userId: user.id })
+      return { message: 'Profil introuvable. Contactez un administrateur.' }
+    }
+    if (profile.role !== 'platform_admin') {
+      warnDev('adjustStock: access denied', { profileId: profile.id, role: profile.role })
+      return { message: 'Non autorisé. Seul un administrateur peut ajuster le stock.' }
+    }
+  } else if (!isDevPreview()) {
+    return { message: 'Vous n\'êtes pas connecté.' }
+  }
+
+  const inventoryItemId = (formData.get('inventory_item_id') as string | null) ?? ''
+  if (!inventoryItemId) return { message: 'Article d\'inventaire non identifié.' }
+
+  const values = {
+    movement_type: (formData.get('movement_type') as MovementType | null) ?? ('' as MovementType),
+    quantity: Number(formData.get('quantity') ?? 0),
+    note: ((formData.get('note') as string | null) ?? '').trim() || null,
+  }
+
+  const errors = validateAdjustStock(values)
+  if (Object.keys(errors).length > 0) return { errors }
+
+  // Fetch current item to validate outbound availability and get shop/product ids.
+  const { data: itemData, error: itemError } = (await supabase
+    .from('inventory_items')
+    .select('shop_id, product_id, quantity_on_hand')
+    .eq('id', inventoryItemId)
+    .single()) as unknown as {
+    data: { shop_id: string; product_id: string; quantity_on_hand: number } | null
+    error: { code: string; message: string } | null
+  }
+
+  if (itemError || !itemData) {
+    warnDev('adjustStock: inventory item not found', { inventoryItemId })
+    return { message: 'Article introuvable en base.' }
+  }
+
+  // App-level check for outbound movements (DB trigger is the second guard).
+  if (OUTBOUND_MOVEMENT_TYPES.includes(values.movement_type)) {
+    const available = Number(itemData.quantity_on_hand ?? 0)
+    if (values.quantity > available) {
+      return {
+        errors: {
+          quantity: `Stock insuffisant. Disponible: ${available % 1 === 0 ? available.toFixed(0) : available.toFixed(3)}`,
+        },
+      }
+    }
+  }
+
+  const smPayload = {
+    inventory_item_id: inventoryItemId,
+    shop_id: itemData.shop_id,
+    product_id: itemData.product_id,
+    movement_type: values.movement_type,
+    quantity: values.quantity,
+    reference_type: 'manual',
+    note: values.note,
+    created_by: user?.id ?? DEV_PROFILE.id,
+  }
+
+  const { error: smError } = (await supabase
+    .from('stock_movements')
+    .insert(smPayload as never)) as unknown as {
+    error: { code: string; message: string } | null
+  }
+
+  if (smError) {
+    if (smError.code === '42501') {
+      warnDev('adjustStock: stock_movements INSERT permission denied', { userId: user?.id })
+      return { message: 'Accès refusé. Vérifiez que la migration 0010 a été appliquée.' }
+    }
+    // The DB trigger raises 'insufficient_stock' when quantity_on_hand would go < 0.
+    if (smError.message.includes('insufficient_stock')) {
+      return { errors: { quantity: 'Stock insuffisant pour ce mouvement.' } }
+    }
+    return { message: `Erreur: ${smError.message}` }
   }
 
   redirect('/stock')

@@ -76,6 +76,54 @@ export async function getCurrentShopId(profileId: string, role: string): Promise
   return null
 }
 
+export async function getInventoryItemById(id: string): Promise<StockItem | null> {
+  const { configured } = getSupabaseConfig()
+  if (!configured) return null
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .select(
+      `id, shop_id, product_id, quantity_on_hand, min_quantity, selling_price, currency, updated_at,
+       product:products(name, slug, sku, unit, category:product_categories(name))`,
+    )
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    if (error.code !== 'PGRST116') {
+      warnDev('getInventoryItemById error', { id, code: error.code, message: error.message })
+    }
+    return null
+  }
+
+  if (!data) return null
+
+  const r = data as unknown as Record<string, unknown>
+  const product = r.product as Record<string, unknown> | null
+  const category = product?.category as Record<string, unknown> | null
+  const qoh = Number(r.quantity_on_hand ?? 0)
+  const minQ = Number(r.min_quantity ?? 0)
+
+  return {
+    id: r.id as string,
+    shop_id: r.shop_id as string,
+    product_id: r.product_id as string,
+    product_name: (product?.name as string) ?? '',
+    product_slug: (product?.slug as string) ?? '',
+    sku: (product?.sku as string | null) ?? null,
+    unit: (product?.unit as string) ?? 'piece',
+    category_name: (category?.name as string | null) ?? null,
+    quantity_on_hand: qoh,
+    min_quantity: minQ,
+    selling_price: r.selling_price != null ? Number(r.selling_price) : null,
+    currency: (r.currency as CurrencyCode | null) ?? null,
+    updated_at: r.updated_at as string,
+    is_low_stock: minQ > 0 && qoh <= minQ,
+  } satisfies StockItem
+}
+
 export async function getStockItems(shopId: string): Promise<StockItem[]> {
   const { configured } = getSupabaseConfig()
   if (!configured) return []
