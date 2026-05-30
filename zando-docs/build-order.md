@@ -78,8 +78,10 @@ Build one module at a time. Each phase must be complete and working before movin
 
 **Goal:** Shop places an order to a supplier. Supplier confirms. Status flows.
 
+- [x] Order list page with tab filters (`src/app/(app)/orders/page.tsx`)
+- [x] Order card, list, empty state, status badge (`src/components/orders/`)
+- [x] Order types + queries (`src/lib/orders/`)
 - [ ] New order form: select supplier → add line items → submit
-- [ ] Order list (filtered by role: shop sees own orders, supplier sees orders directed to them)
 - [ ] Order detail page with status badge and line items
 - [ ] Order status transitions: draft → submitted → confirmed → shipped → delivered / cancelled
 - [ ] Activity log entry on each status change
