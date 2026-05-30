@@ -15,7 +15,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Create enums in Postgres (included in migration 0001)
 - [x] Create `profiles` trigger (auto-create profile on auth.user insert — `trg_create_profile_on_signup` in migration 0001)
 - [x] Set up Supabase client helpers (`src/lib/supabase/client.ts`, `server.ts`, `types.ts`)
-- [ ] Set up Next.js middleware for auth guard
+- [x] Set up auth + role foundation (`src/lib/auth/`, `proxy.ts`, `app/auth/callback/route.ts`)
 - [ ] Build login page (`/login`)
 - [ ] Build post-login redirect by role
 - [ ] Test: each role can log in and land on their dashboard shell
