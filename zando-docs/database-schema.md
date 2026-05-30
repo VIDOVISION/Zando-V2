@@ -117,10 +117,12 @@ Global product catalog shared across all shops. Managed exclusively by `platform
 | description | text | |
 | unit | text NOT NULL | DEFAULT 'piece' — e.g. piece, kg, litre, carton, sac |
 | image_url | text | |
+| sku | text | nullable; UNIQUE when set (partial index `idx_products_sku`) |
+| is_active | boolean NOT NULL | DEFAULT true — soft-delete flag |
 | created_at | timestamptz NOT NULL | DEFAULT now() |
 | updated_at | timestamptz NOT NULL | DEFAULT now(); set by trg_set_updated_at_products |
 
-**Indexes:** `idx_products_category_id`
+**Indexes:** `idx_products_category_id`, `idx_products_sku` (partial unique, WHERE sku IS NOT NULL)
 
 ---
 

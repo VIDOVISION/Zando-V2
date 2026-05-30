@@ -37,7 +37,9 @@ Build one module at a time. Each phase must be complete and working before movin
 
 **Goal:** Global product catalog visible to all roles. Admin can manage.
 
-- [ ] Products list page with search and category filter
+- [x] Products list page with search and category filter (`src/app/(app)/products/page.tsx`)
+- [x] Product card, list, empty state components (`src/components/products/`)
+- [x] Product types + server queries (`src/lib/products/`)
 - [ ] Product detail page
 - [ ] Create/edit product form (platform_admin only)
 - [ ] Seed file: `fixtures/products.ts` with 20 sample products
