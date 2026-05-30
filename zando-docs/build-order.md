@@ -28,6 +28,7 @@ Build one module at a time. Each phase must be complete and working before movin
 
 - [x] Build shared layout — bottom tabs on mobile, sidebar on desktop (`src/components/layout/`)
 - [x] Build app shell + placeholder dashboard (`src/app/(app)/dashboard/page.tsx`)
+- [x] Build More page — secondary menu with 6 sections (`src/app/(app)/more/page.tsx`)
 - [ ] Build role-aware navigation (tabs visible based on profile.role)
 - [ ] Test: UI renders correctly on 375px (iPhone SE) and 1280px (desktop)
 
