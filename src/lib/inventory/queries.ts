@@ -216,6 +216,28 @@ export async function getInventoryForProduct(
   } satisfies ProductInventorySummary
 }
 
+export type ShopOption = { id: string; name: string; city: string | null }
+
+export async function getShops(): Promise<ShopOption[]> {
+  const { configured } = getSupabaseConfig()
+  if (!configured) return []
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('shops')
+    .select('id, name, city')
+    .eq('is_active', true)
+    .order('name', { ascending: true })
+
+  if (error) {
+    warnDev('getShops error', { code: error.code, message: error.message })
+    return []
+  }
+
+  return (data ?? []) as unknown as ShopOption[]
+}
+
 export function computeSummary(items: StockItem[]): StockSummary {
   return {
     total_items: items.length,

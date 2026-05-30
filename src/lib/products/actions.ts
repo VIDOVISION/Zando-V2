@@ -12,16 +12,33 @@ export type CreateProductState = {
   message?: string
 }
 
+function warnDev(message: string, detail?: unknown) {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`[zando/products/actions] ${message}`, detail ?? '')
+  }
+}
+
 export async function createProduct(
   _prevState: CreateProductState,
   formData: FormData,
 ): Promise<CreateProductState> {
-  // Auth: only platform_admin may create products (RLS also enforces this).
-  if (!isDevPreview()) {
+  // Auth: check the REAL Supabase session first, even in dev preview.
+  // isDevPreview() only bypasses the redirect-to-login UI gate.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
     const profile = await getCurrentProfile()
-    if (!profile || profile.role !== 'platform_admin') {
+    if (!profile) {
+      warnDev('no profile row found for authenticated user', { userId: user.id })
+      return { message: 'Profil introuvable. Contactez un administrateur.' }
+    }
+    if (profile.role !== 'platform_admin') {
+      warnDev('access denied — insufficient role', { profileId: profile.id, role: profile.role })
       return { message: 'Non autorisé. Seul un administrateur peut créer des produits.' }
     }
+  } else if (!isDevPreview()) {
+    return { message: 'Vous n\'êtes pas connecté.' }
   }
 
   // Parse form data
@@ -50,7 +67,7 @@ export async function createProduct(
     return { errors: { name: 'Le nom ne peut pas être converti en identifiant URL.' } }
   }
 
-  const supabase = await createClient()
+  // supabase client already created above for auth — reuse it.
 
   // Supabase Database types are stub placeholders until `supabase gen types` runs.
   // Cast the insert payload and result to avoid the 'never[]' stub inference.

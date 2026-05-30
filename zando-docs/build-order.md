@@ -56,6 +56,7 @@ Build one module at a time. Each phase must be complete and working before movin
 - [x] Stock components — summary row, item card, list, movement list, empty state (`src/components/stock/`)
 - [x] Inventory types + queries — connected to live Supabase (`src/lib/inventory/`)
 - [ ] Inventory item detail with movement history
+- [x] Add product to inventory form — platform_admin (`src/app/(app)/stock/add/page.tsx`)
 - [ ] Stock adjustment form (manual in/out)
 - [ ] DB trigger: stock_movements insert → update inventory_items.quantity_on_hand
 - [ ] Low-stock alert badge on nav tab

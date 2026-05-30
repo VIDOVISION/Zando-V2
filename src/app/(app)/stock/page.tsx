@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { isDevPreview, DEV_PROFILE } from '@/src/lib/dev'
 import { requireRole } from '@/src/lib/auth/require-role'
 import {
@@ -40,12 +41,22 @@ export default async function StockPage() {
   return (
     <div className="space-y-6 p-4">
       {/* Page header */}
-      <div>
-        <h1 className="text-xl font-semibold text-gray-900">Stock</h1>
-        {shopId && items.length > 0 && (
-          <p className="mt-0.5 text-sm text-gray-400">
-            {items.length} article{items.length !== 1 ? 's' : ''} dans votre inventaire
-          </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">Stock</h1>
+          {shopId && items.length > 0 && (
+            <p className="mt-0.5 text-sm text-gray-400">
+              {items.length} article{items.length !== 1 ? 's' : ''} dans votre inventaire
+            </p>
+          )}
+        </div>
+        {(profile.role === 'platform_admin' || isDevPreview()) && (
+          <Link
+            href="/stock/add"
+            className="shrink-0 rounded-lg bg-[#0d9488] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0f766e]"
+          >
+            + Ajouter
+          </Link>
         )}
       </div>
 
