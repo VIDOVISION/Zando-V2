@@ -149,3 +149,30 @@ Migrations 0001–0003 are safe for all environments. Migrations 0004–0005 are
 **Do not apply to:** staging or production.
 
 In production, `SELECT` grants to `anon` are unnecessary (all production queries use `TO authenticated` policies) and would expose table access to unauthenticated API requests.
+
+---
+
+## Migration 0007 — Platform Admin Product Write Grants
+
+`supabase/migrations/0007_platform_admin_product_write_policies.sql` is the correct write model for products.
+
+**The gap it closes:** migration 0005 only granted `SELECT` to `authenticated`. The RLS `products_insert`/`products_update` policies (from migration 0001) already required `platform_admin`, but Postgres checks table-level GRANT before RLS — so `authenticated` users received `42501 permission denied` on INSERT regardless of their role.
+
+**Apply to:** all environments (dev, staging, production). This migration is safe and correct for production.
+
+### Setting up a platform_admin account
+
+To create products through the UI, you need a real Supabase Auth user with `platform_admin` role:
+
+1. **Create the user** — Supabase dashboard → Authentication → Users → Add user (or sign up via `/login`).
+2. **Find the profile row** — the trigger `trg_create_profile_on_signup` auto-creates it with `role = 'shop_owner'`.
+3. **Promote to platform_admin:**
+   ```sql
+   UPDATE public.profiles
+   SET role = 'platform_admin'
+   WHERE id = '<your-auth-uid>';
+   ```
+4. **Log in** at `/login` with that account.
+5. Navigate to `/products` and click **+ Nouveau**.
+
+The `anon` role (dev preview without a session) will still receive `42501` on INSERT — this is intentional and shows a clear French error message in the form.

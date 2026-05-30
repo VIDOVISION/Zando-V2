@@ -74,6 +74,15 @@ export async function createProduct(
   }
 
   if (error) {
+    // 42501 — table-level permission denied. Happens when:
+    // a) dev preview (anon role, no INSERT grant) or
+    // b) authenticated user without platform_admin role.
+    if (error.code === '42501') {
+      return {
+        message:
+          'Accès refusé. Connectez-vous avec un compte platform_admin pour créer des produits.',
+      }
+    }
     // Unique constraint violation — slug or SKU conflict
     if (error.code === '23505') {
       if (error.message.includes('sku')) {
